@@ -14,6 +14,7 @@ The library includes features such as:
 - Handling and logging of errors and exceptions.
 - Support for timestamping of changes for subnets and addresses.
 - Support for allocation of free IP addresses from subnets selecting algorithms managing fragmentation of ranges of free addresses (best-fit, first-fit, and worst-fit).
+- Implements some form of protection against the scanning agent updating or deleting some special addresses (base address, broadcast address, router address) in subnets.
 
 ## Requirements
 - Python 3.12 or higher (it uses python typing features)
