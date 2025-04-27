@@ -2,6 +2,7 @@
 """This file provides management for wrapping a dictionary describing a phpIPAM Scan Agent with an object that adds functions to manage it."""
 
 from datetime import datetime, timezone
+from typing import Optional
 
 class ipamScanAgent:
     """This object wraps a JSON dictionary representing a phpIPAM Scan Agent either returned by phpypam or created to insert a new IP address."""
@@ -29,7 +30,7 @@ class ipamScanAgent:
     def getCode(self) -> str:
         return self._agent.get('code', '')
     
-    def getLastAccess(self) -> datetime |None:
+    def getLastAccess(self) -> Optional[datetime]:
         """Returns the last access date of the agent."""
         last = self._agent.get('last_access', '')
         if not last:

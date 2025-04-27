@@ -5,8 +5,7 @@
 import logging
 mylogger = logging.getLogger()
 
-import sys, os, getpass, ssl, certifi
-from typing import Any
+import sys, os, getpass, ssl
 import re
 import numpy as np
 
@@ -21,7 +20,9 @@ from .ipamSubnet import ipamSubnet
 from .ipamAddress import ipamAddress, ipamTags
 from .ipamScanAgent import ipamScanAgent
 
-from ipaddress import IPv4Address, IPv6Address, IPv4Network, IPv6Network, ip_address, ip_network
+from ipaddress import IPv4Address, IPv6Address, IPv4Network, IPv6Network, ip_address
+
+from typing import Optional, Union, Any
 
 class ipamServer:
     """Manages a connection to a phpIPAM service and high level operations on addresses."""
@@ -172,7 +173,7 @@ class ipamServer:
 
     ################################################
 
-    def findSubnetsbyIPMask(self, base_ip:IPv4Address|IPv6Address, mask:int) -> list[ipamSubnet]:
+    def findSubnetsbyIPMask(self, base_ip:Union[IPv4Address, IPv6Address], mask:int) -> list[ipamSubnet]:
         """Find one or more subnets defined by base_ip/mask at the phpIPAM service.
         :param base_ip: The base IP address of the subnet.
         :param mask: An integer with the prefix length of the subnet mask.
@@ -185,7 +186,7 @@ class ipamServer:
 
     ################################################
 
-    def findIPs(self, ip:IPv4Address|IPv6Address) -> list[ipamAddress]:
+    def findIPs(self, ip:Union[IPv4Address, IPv6Address]) -> list[ipamAddress]:
         """Find the IP addresses registered inside a subnet at the phpIPAM service matching a given IP address.
         In theory, only one address will be returned in the list.
         :param ip: An object representing an ip address.
@@ -227,9 +228,9 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
-    def _firstFit2(self, range:IPv4Network | IPv6Network, used_ips:list[IPv4Address | IPv6Address], num) -> list[IPv4Address | IPv6Address]:
+    def _firstFit2(self, range:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> list[Union[IPv4Address, IPv6Address]]:
         # List of contiguous addresses
-        freePool:list[IPv4Address | IPv6Address] = []
+        freePool:list[Union[IPv4Address, IPv6Address]] = []
         # Go through the IP range of the subnet
         for addr in range:
             if addr in used_ips:
@@ -243,7 +244,7 @@ class ipamServer:
                     return freePool
         return []
 
-    def _pools(self, netRange:IPv4Network | IPv6Network, used_ips:list[IPv4Address | IPv6Address]) -> list[tuple[IPv4Address | IPv6Address, int]]:
+    def _pools(self, netRange:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]]) -> list[tuple[Union[IPv4Address, IPv6Address], int]]:
         # List of contiguous addresses
         pools = []
         startIP = None
@@ -268,7 +269,7 @@ class ipamServer:
             pools.append((startIP,count))
         return pools
 
-    def _bestFit(self, netRange:IPv4Network | IPv6Network, used_ips:list[IPv4Address | IPv6Address], num) -> IPv4Address | IPv6Address | None:
+    def _bestFit(self, netRange:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
         # Get all pools
         pools = self._pools(netRange, used_ips=used_ips)
         # Get suitable pools
@@ -280,9 +281,9 @@ class ipamServer:
         # Get best pool
         best = np.min([l for ip,l in pools if l>=num])
         bestpool = [(ip,l) for ip,l in pools if l==best].pop()
-        return bestpool[0]
+        return bestpool[0] # type: ignore
 
-    def _worstFit(self, netRange:IPv4Network | IPv6Network, used_ips:list[IPv4Address | IPv6Address], num) -> IPv4Address | IPv6Address | None:
+    def _worstFit(self, netRange:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
         # Get all pools
         pools = self._pools(netRange, used_ips=used_ips)
         # Get suitable pools
@@ -294,9 +295,9 @@ class ipamServer:
         # Get worst pool
         worst = np.max([l for ip,l in pools if l>=num])
         worstpool = [(ip,l) for ip,l in pools if l==worst].pop()
-        return worstpool[0]
+        return worstpool[0] # type: ignore
 
-    def _firstFit(self, range:IPv4Network | IPv6Network, used_ips:list[IPv4Address | IPv6Address], num) -> IPv4Address | IPv6Address | None:
+    def _firstFit(self, range:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
         # List of contiguous addresses
         startIP = None
         endIP = None
@@ -316,7 +317,7 @@ class ipamServer:
                     endIP = addr
                 # If there are enough addresses, return
                 if startIP + num - 1 == addr:
-                    return startIP
+                    return startIP # type: ignore
         return None
 
     def findFree(self, subnet:ipamSubnet, num:int, fitAlg:str = 'FirstFit') -> list[ipamAddress]:
@@ -332,19 +333,21 @@ class ipamServer:
         used = self.findIPsbyNet(subnet)
         used_ips = [u.getIP() for u in used]
         netRange = subnet.getSubnet()
-        match fitAlg:
-            case 'FirstFit':
+        if fitAlg == 'FirstFit':
                 startIP = self._firstFit(netRange, used_ips, num)
-            case 'BestFit':
+        elif fitAlg == 'BestFit':
                 startIP = self._bestFit(netRange, used_ips, num)
-            case 'WorstFit':
+        elif fitAlg == 'WorstFit':
                 startIP = self._worstFit(netRange, used_ips, num)
+        else:
+                startIP = self._firstFit(netRange, used_ips, num)
+
         if startIP: # type: ignore
-            return [ipamAddress(ip=startIP + offset, subnet=subnet) for offset in range(num) ]
+            return [ipamAddress(ip=startIP + offset, subnet=subnet) for offset in range(num) ] # type: ignore
         else:
             return []
         
-    def registerIP(self, addr:ipamAddress) -> ipamAddress|None:
+    def registerIP(self, addr:ipamAddress) -> Optional[ipamAddress]:
         """Register a free IP address at phpIPAM service. If the address has been registered before,
         registration will fail.
         :param addr: The IP address to register."""
@@ -367,7 +370,7 @@ class ipamServer:
 
         self.pi.delete_entity(controller='addresses', controller_path=f'{addr.getId()}')
     
-    def annotate_address(self, ipAddress:IPv4Address|IPv6Address, sn:ipamSubnet, description:str, tag:int=2, apiblock:int = 0, apinotremovable:int = 0, isrouter:int = 0, hostname:str='', cleanLastseen:bool=False, force:bool = False):
+    def annotate_address(self, ipAddress:Union[IPv4Address, IPv6Address], sn:ipamSubnet, description:str, tag:int=2, apiblock:int = 0, apinotremovable:int = 0, isrouter:int = 0, hostname:str='', cleanLastseen:bool=False, force:bool = False):
         # Get address
         baseaddresIpam = self.findIPs(ipAddress)
         # If exists update else create
@@ -417,7 +420,7 @@ class ipamServer:
                 self.annotate_address(ipAddress=routerIP, sn=sn, description="DEFAULT ROUTER", tag=ipamTags.TAG_router, apiblock=0, apinotremovable=1, isrouter=1, hostname=routerHostname, force=force)
 
     # Get DNS address for subnet
-    def dns_subnet(self, sn:ipamSubnet) -> list[IPv4Address|IPv6Address]:
+    def dns_subnet(self, sn:ipamSubnet) -> list[Union[IPv4Address, IPv6Address]]:
         if sn.isPool:
             dnsId=sn._net.get('nameserverId',0)
             if dnsId != 0:

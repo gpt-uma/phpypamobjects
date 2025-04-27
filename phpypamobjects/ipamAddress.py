@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 """This file provides management for wrapping a dictionary describing a phpIPAM IPaddress with an object that adds functions to manage it."""
 
-from datetime import datetime, timezone
-from typing import Any
 from .ipamSubnet import ipamSubnet
+
 from ipaddress import IPv4Address, IPv6Address, ip_address
+from datetime import datetime
+from typing import Optional, Union, Any
 
 class ipamTags:
     TAG_offline = 1
@@ -18,7 +19,7 @@ class ipamTags:
 
 class ipamAddress:
     """This object wraps a JSON dictionary representing a phpIPAM IP address either returned by phpypam or created to insert a new IP address."""
-    def __init__(self, addr:dict = None, ip:IPv4Address|IPv6Address = None, subnet:ipamSubnet = None) -> None: # type: ignore
+    def __init__(self, addr:dict = None, ip:Union[IPv4Address, IPv6Address] = None, subnet:ipamSubnet = None) -> None: # type: ignore
         """Creates a new object. The object is initialized either with a dictionary returned by phpypam or with an IP and subnet identifier.
         :param addr: A JSON dictionary returned by phpypam.
         :param ip: An IP address.
@@ -33,16 +34,16 @@ class ipamAddress:
         else:
             raise ValueError('Both arguments are None.')
 
-    def getId(self) -> int | None:
+    def getId(self) -> Optional[int]:
         return self._addr.get('id')
     
-    def getIP(self) -> IPv4Address | IPv6Address:
+    def getIP(self) -> Union[IPv4Address, IPv6Address]:
         return ip_address(self._addr.get('ip')) # type: ignore
     
     def setIP(self, ip:IPv4Address):
         self._addr['ip'] = str(ip)
     
-    def getSubnetId(self) -> int | None:
+    def getSubnetId(self) -> Optional[int]:
         return self._addr.get('subnetId')
     
     def setSubnetId(self, subnetid):
@@ -63,7 +64,7 @@ class ipamAddress:
         value = self.getField('note')
         return value if value else ''
 
-    def getLastSeen(self) -> datetime|None:
+    def getLastSeen(self) -> Optional[datetime]:
         value = self.getField('lastSeen','')
         if value:
             ts = datetime.fromisoformat(value)
@@ -73,7 +74,7 @@ class ipamAddress:
         else:
             return None
 
-    def getField(self, field:str, default:Any = None) -> Any|None:
+    def getField(self, field:str, default:Any = None) -> Optional[Any]:
         """Get any field of the JSON object.
         :param field: The identifier of the field to return.
         :return: The value of the field."""        

@@ -1,10 +1,11 @@
 #!/usr/bin/python3
-"""This file provides management for wrapping a dictionary describing a phpIPAM subnet with an
-object that adds functions to manage it."""
+"""
+This file provides management for wrapping a dictionary describing a phpIPAM subnet with an object that adds functions to manage it.
+"""
 
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from datetime import datetime, timedelta
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network, ip_network, ip_address
+from typing import Optional, Union
 
 class ipamSubnet:
     """This object wraps a JSON dictionary representing a phpIPAM IP subnet returned by phpypam."""
@@ -12,57 +13,57 @@ class ipamSubnet:
         """Creates a new object. The object is initialized with a dictionary returned by phpypam.
         :param addr: A JSON dictionary returned by phpypam."""
         self._net:dict = net
-        self.id:int | None =  net.get('id')
-        self.subnet:str | None =  net.get('subnet')
-        self.mask:str | None =  net.get('mask')
-        self.sectionId:int | None =  net.get('sectionId')
-        self.description:str | None =  net.get('description')
-        self.linked_subnet:int | None =  net.get('linked_subnet')
-        self.firewallAddressObject:int | None =  net.get('firewallAddressObject')
-        self.vrfId:int | None =  net.get('vrfId')
-        self.masterSubnetId:int | None =  net.get('masterSubnetId')
-        self.allowRequests:int | None =  net.get('allowRequests')
-        self.vlanId:int | None =  net.get('vlanId')
-        self.showName:int | None =  net.get('showName')
-        self.device:int | None =  net.get('device')
-        self.permissions:list | None =  net.get('permissions')
-        self.pingSubnet:int | None =  net.get('pingSubnet')
-        self.discoverSubnet:int | None =  net.get('discoverSubnet')
-        self.resolveDNS:int | None =  net.get('resolveDNS')
-        self.DNSrecursive:int | None =  net.get('DNSrecursive')
-        self.DNSrecords:int | None =  net.get('DNSrecords')
-        self.nameserverId:int | None =  net.get('nameserverId')
-        self.scanAgent:int | None =  net.get('scanAgent')
-        self.customer_id:int | None =  net.get('customer_id')
-        self.isFolder:int | None =  net.get('isFolder')
-        self.isFull:int | None =  net.get('isFull')
-        self.isPool:int | None =  net.get('isPool')
-        self.tag:int | None =  net.get('tag')
-        self.threshold:int | None =  net.get('threshold')
-        self.location:list | None =  net.get('location')
+        self.id:Optional[int] =  net.get('id')
+        self.subnet:Optional[str] =  net.get('subnet')
+        self.mask:Optional[str] =  net.get('mask')
+        self.sectionId:Optional[int] =  net.get('sectionId')
+        self.description:Optional[str] =  net.get('description')
+        self.linked_subnet:Optional[int] =  net.get('linked_subnet')
+        self.firewallAddressObject:Optional[int] =  net.get('firewallAddressObject')
+        self.vrfId:Optional[int] =  net.get('vrfId')
+        self.masterSubnetId:Optional[int] =  net.get('masterSubnetId')
+        self.allowRequests:Optional[int] =  net.get('allowRequests')
+        self.vlanId:Optional[int] =  net.get('vlanId')
+        self.showName:Optional[int] =  net.get('showName')
+        self.device:Optional[int] =  net.get('device')
+        self.permissions:Optional[list] =  net.get('permissions')
+        self.pingSubnet:Optional[int] =  net.get('pingSubnet')
+        self.discoverSubnet:Optional[int] =  net.get('discoverSubnet')
+        self.resolveDNS:Optional[int] =  net.get('resolveDNS')
+        self.DNSrecursive:Optional[int] =  net.get('DNSrecursive')
+        self.DNSrecords:Optional[int] =  net.get('DNSrecords')
+        self.nameserverId:Optional[int] =  net.get('nameserverId')
+        self.scanAgent:Optional[int] =  net.get('scanAgent')
+        self.customer_id:Optional[int] =  net.get('customer_id')
+        self.isFolder:Optional[int] =  net.get('isFolder')
+        self.isFull:Optional[int] =  net.get('isFull')
+        self.isPool:Optional[int] =  net.get('isPool')
+        self.tag:Optional[int] =  net.get('tag')
+        self.threshold:Optional[int] =  net.get('threshold')
+        self.location:Optional[list] =  net.get('location')
         if net.get('editDate'):
             ts= datetime.fromisoformat(self._net['editDate'])
             if not ts.tzname():
                 ts = ts.astimezone()
-            self.editDate:datetime|None = ts
+            self.editDate:Optional[datetime] = ts
         else:
-            self.editDate:datetime|None = None
+            self.editDate:Optional[datetime] = None
         if net.get('editDate'):
             ts= datetime.fromisoformat(self._net['editDate'])
             if not ts.tzname():
                 ts = ts.astimezone()
-            self.lastScan:datetime|None= ts
+            self.lastScan:Optional[datetime]= ts
         else:
-            self.lastScan:datetime|None = None
+            self.lastScan:Optional[datetime] = None
         if net.get('lastDiscovery'):
             ts= datetime.fromisoformat(self._net['lastDiscovery'])
             if not ts.tzname():
                 ts = ts.astimezone()
-            self.lastDiscovery:datetime|None= ts
+            self.lastDiscovery:Optional[datetime]= ts
         else:
-            self.lastDiscovery:datetime|None = None
+            self.lastDiscovery:Optional[datetime] = None
 
-    def buildDictionary(self) -> dict:
+    def buildDictionary(self):
         """Build a dictionary translating the fields of the object to dictionary format.
         :return: A dictionary representing a subnet in phpIPAM format."""
         self._net['id']=self.id
@@ -94,7 +95,7 @@ class ipamSubnet:
         self._net['threshold']=self.threshold
         self._net['location']=self.location
 
-    def getEditData(self) -> datetime|None:
+    def getEditData(self) -> Optional[datetime]:
         if not self._net.get('editDate'):
             return None
         ts= datetime.fromisoformat(self._net['editDate'])
@@ -121,13 +122,13 @@ class ipamSubnet:
             ts = ts.astimezone()
         return ts
 
-    def getId(self) -> int | None:
+    def getId(self) -> Optional[int]:
         return self._net.get('id')
 
-    def getBaseaddr(self) -> IPv4Address|IPv6Address|None:
+    def getBaseaddr(self) -> Union[IPv4Address, IPv6Address, None]:
         return ip_address(str(self._net.get('subnet'))) if self._net.get('subnet') else None
 
-    def getMask(self) -> int|None:
+    def getMask(self) -> Optional[int]:
         return self._net.get('mask')
 
     def getDictionary(self) -> dict:
@@ -143,7 +144,7 @@ class ipamSubnet:
         self._net['lastScan'] = datetime.now().isoformat()
         return {'lastScan': self._net['lastScan']}
 
-    def getSubnet(self) -> IPv4Network | IPv6Network:
+    def getSubnet(self) -> Union[IPv4Network, IPv6Network]:
         """Returns an object representing the subnet range.
         :return: A IPv4|6Network object."""
         return ip_network(f"{self._net['subnet']}/{self._net['mask']}")

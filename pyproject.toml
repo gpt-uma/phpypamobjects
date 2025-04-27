@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phpypamobjects"
-version = "0.1.6"
+version = "0.1.8"
 description = "A high level API client library for phpIPAM.  This library wraps the phpypam library with higher level objects representing phpIPAM abstractions like addresses, subnets and scan agents"
 readme = "README.md"
 authors = [
@@ -12,21 +12,19 @@ authors = [
 ]
 classifiers = [
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
 ]
 requires-python = ">=3.9.2"
 dependencies = [
-    "numpy>=2.2.5",
-    "certifi>=2025.1.31",
+    "numpy>=1.19.5",
     "phpypam>=1.0.2",
-    "python-nmap>=0.7.1"
+    "python-nmap>=0.7.1",
 ]
-license = {text = "MIT"}
+license =  "MIT"
 license-files = ["LICENSE"]
 
 [project.urls]
 Homepage = "https://www.ac.uma.es/~guille/phpypamobjects"
 Documentation = "https://www.ac.uma.es/~guille/phpypamobjects#readme"
 Issues = "https://www.ac.uma.es/~guille/phpypamobjects/issues"
-Source Code = "https://www.ac.uma.es/~guille/phpypamobjects"
