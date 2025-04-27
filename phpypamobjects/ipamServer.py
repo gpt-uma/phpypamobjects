@@ -476,6 +476,9 @@ class ipamServer:
                 note = ''
             else:
                 note = f"# {note}"
-            output += f"{str(a.getIP()):15} {a.getField('hostname').split('.')[0]:17} {description} {note}\n" # type: ignore
+            host = a.getField('hostname',default='------')
+            if not host:
+                 host = '----------'
+            output += f"{str(a.getIP()):15} {host.split('.')[0]:17} {description} {note}\n" # type: ignore
         output += '\n\n'
         return output
