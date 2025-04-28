@@ -25,6 +25,6 @@ license =  "MIT"
 license-files = ["LICENSE"]
 
 [project.urls]
-Homepage = "https://www.ac.uma.es/~guille/phpypamobjects"
-Documentation = "https://www.ac.uma.es/~guille/phpypamobjects#readme"
-Issues = "https://www.ac.uma.es/~guille/phpypamobjects/issues"
+Homepage = "https://github.com/gpt-uma/phpypamobjects"
+Documentation = "https://github.com/gpt-uma/phpypamobjects/blob/main/README.md"
+Issues = "https://github.com/gpt-uma/phpypamobjects/issues"
