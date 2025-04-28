@@ -95,7 +95,7 @@ class ipamSubnet:
         self._net['threshold']=self.threshold
         self._net['location']=self.location
 
-    def getEditData(self) -> Optional[datetime]:
+    def getEditDate(self) -> Optional[datetime]:
         if not self._net.get('editDate'):
             return None
         ts= datetime.fromisoformat(self._net['editDate'])
