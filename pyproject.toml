@@ -21,7 +21,7 @@ dependencies = [
     "phpypam>=1.0.2",
     "python-nmap>=0.7.1",
 ]
-license =  "MIT"
+license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 
 [project.urls]
