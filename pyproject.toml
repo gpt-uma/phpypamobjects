@@ -39,3 +39,6 @@ Homepage = "https://github.com/gpt-uma/phpypamobjects"
 Documentation = "https://github.com/gpt-uma/phpypamobjects/blob/main/README.md"
 Repository = "https://github.com/gpt-uma/phpypamobjects.git"
 Issues = "https://github.com/gpt-uma/phpypamobjects/issues"
+
+[tool.setuptools]
+packages = ["phpypamobjects"]
