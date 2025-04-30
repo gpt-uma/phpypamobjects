@@ -98,7 +98,7 @@ class ipamAddress:
             if self.getFieldInt('custom_apiblock') == 1:
                 raise PermissionError(f"Address {self._addr.get('ip')} has apiblock=true: can't update field {field}")
             # Block fields edition for special tags and routers
-            if (self.getFieldInt('tag') >= ipamTags.TAG_reserved or self.getFieldInt('is_gateway') == 1 ) and (field != 'lastSeen' and field != 'custom_tcpports' and field != 'mac'):
+            if (self.getFieldInt('tag') > ipamTags.TAG_used or self.getFieldInt('is_gateway') == 1 ) and (field != 'lastSeen' and field != 'custom_tcpports' and field != 'mac'):
                 raise PermissionError(f"Address {self._addr.get('ip')} has type >=2(RESERVED) or isgateway: can't update field {field}")
 
         if self._addr.get(field) != value:

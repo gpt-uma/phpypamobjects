@@ -365,7 +365,7 @@ class ipamServer:
             if addr.getFieldInt('custom_apiblock') == 1 or addr.getFieldInt('custom_apinotremovable') == 1:
                 raise PermissionError("API can't remove protected addresses")
             # Block remove  for special tags and routers
-            if addr.getFieldInt('tag') > 2 or addr.getFieldInt('is_gateway') == 1:
+            if addr.getFieldInt('tag') > ipamTags.TAG_used or addr.getFieldInt('is_gateway') == 1:
                 raise PermissionError("API can't remove addresses marked as special ones")
 
         self.pi.delete_entity(controller='addresses', controller_path=f'{addr.getId()}')
