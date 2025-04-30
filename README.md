@@ -30,6 +30,10 @@ This library is distributed as a Python package and can be installed using pip. 
 pip install phpypamobjects-<version>.tar.gz
 ```
 
+Remember to make the changes to the SQL schema needed by this library and by the scan agent. Changes include some additional `custom fields` for the ipaddresses table, and some additional ipTags used to mark addresses.
+
+To apply those changes to your database, look for the `sql` directory in this project and execute the SQL script(s) in there on your phpIPAM MySQL database.
+
 # Usage
 
 This library is designed to be used in a Python client application that needs to interact with a phpIPAM service. It provides a set of classes and methods that allow you to perform various operations on IP addresses, subnets, and other related objects in phpIPAM.
@@ -88,7 +92,7 @@ The library provides the following methods for allocating free IP addresses:
   * The custom field `custom_apiblock` exists and it is 1 for this address.
   * The custom field `custom_apinotremovable` exists and it is 1 for this address.
   * The field `is_gateway` is set to 1 for this address.
-  * The field `tag` is greater than 2 for this address (only addresses tagged as **offline** or **used** can be deleted).
+  * The field `tag` is different from offline or used for this address (only addresses tagged as **offline** or **used** can be deleted).
 
 ### Updating objects
 
@@ -97,6 +101,8 @@ The following methods are used to update objects in phpIPAM service:
 - `updateSubnetLastScan(subnet)`: Updates the `lastScan` field of the given subnet in phpIPAM service to the current date and time. This method is used by address scannning agents to update the last scan time of the subnet. The subnet must be an instance of the `ipamSubnet` class.
 - `updateSubnetLastDiscovery(subnet)`: Updates the `lastDiscovery` field of the given subnet in phpIPAM service to the current date and time. This method is used by address scannning agents to update the last discovery time of the subnet. The subnet must be an instance of the `ipamSubnet` class.
 - `updateScanAgent(agent)`: Updates the `lastAccess` field of the given scanning agent in phpIPAM service to the current date and time. This method is used by address scannning agents to update the last access time every time that thay connect to the phpIPAM service. The agent must be an instance of the `ipamScanAgent` class.
+
+Remember that there are some special conditions that prevent updating addresses. When any condition prevents against update, an exception is raised by the method updating a field of an address, as the verification is done in the client library. The conditions preventing modification are listed at the end of the previous section.
 
 ### Miscellaneous methods
 
