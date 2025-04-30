@@ -4,15 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phpypamobjects"
-version = "0.1.9"
+version = "0.1.10"
 description = "A high level API client library for phpIPAM.  This library wraps the phpypam library with higher level objects representing phpIPAM abstractions like addresses, subnets and scan agents"
 readme = "README.md"
 authors = [
     {name = "Guillermo Pérez Trabado", email = "guille@ac.uma.es"},
 ]
 classifiers = [
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    "Development Status :: 4 - Beta",
+    # Indicate who your project is intended for
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
+    # Specify the Python versions you support here.
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
 requires-python = ">=3.9.2"
@@ -27,4 +37,5 @@ license-files = ["LICENSE"]
 [project.urls]
 Homepage = "https://github.com/gpt-uma/phpypamobjects"
 Documentation = "https://github.com/gpt-uma/phpypamobjects/blob/main/README.md"
+Repository = "https://github.com/gpt-uma/phpypamobjects.git"
 Issues = "https://github.com/gpt-uma/phpypamobjects/issues"
