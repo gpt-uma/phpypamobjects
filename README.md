@@ -70,8 +70,9 @@ Methods for listing objects in phpIPAM include:
 - `getAllScanAgents()`: Returns a list of all scanning agents in the phpIPAM service.
 
 Methods for searching objects in phpIPAM include:
-- `findIPs(ip)`: Returns a list of IP addresses that match the given IP address. The IP address can be a IPv4 or IPv6 address. The method returns a list of IP addresses that match the given IP address. Again, it should return only one IP address, but it returns a list for consistency with the result of the other methods.
 - `findSubnetsbyIPMask(baseaddress, mask)`: Returns a list of subnets that match the given base address and mask. Formally, it should return only one subnet, but in phpIPAM it can return a supernet and a subnet with the same base address and mask.
+- `findVLANbyId(id)`: Returns a list of VLANs containing the one identified by the given id (this is the `DB id`, **not** the `802.1Q tag`).
+- `findIPs(ip)`: Returns a list of IP addresses that match the given IP address. The IP address can be a IPv4 or IPv6 address. The method returns a list of IP addresses that match the given IP address. Again, it should return only one IP address, but it returns a list for consistency with the result of the other methods.
 - `findIPsbyNet(subnet)`: Returns a list of IP addresses that belong to the given subnet.
 - `findIPsbyHostName(hostname)`: Returns a list of IP addresses that have exactly the given hostname. As a host may have multiple IP addresses, this method returns a list of IP addresses.
 - `findIPsbyField(subnet, field, pattern)`: Returns a list of IP addresses that match the given regular expression pattern in the given field. The field can be any field of the phpIPAM address object, including custom fields.
@@ -170,6 +171,15 @@ The methods of this class are:
   - `getLastAccess()`: Returns the date of the last access of the scanning agent. If the agent has never been accessed before, it returns a None value.
   - `updateLastAccess()`: Updates the last access date of the scanning agent to the current date and time. This method is used by scanning agents to update the last access date of the agent.
 
+## Operating on VLANs (ipamVLAN class)
+
+The methods of this class only operate on the object itself and not on the phpIPAM service. The methods of the `ipamServer` class (if any) are used to persist the changes in the phpIPAM service.
+The methods of this class are:
+  - `getId()`: Returns the numeric ID of the VLAN which is used to reference the agent in ipamSubnet objects. It is seldom used directly.
+  - `getName()`: Returns the name of the vlan. It has only descriptive purposes and is not used to identify the VLAN in the phpIPAM service.
+  - `getDescription()`: Returns the description of the VLAN. Only for descriptive purposes.
+  - `getNumber()`: Returns the numeric tag (802.1Q tag) of the VLAN.
+
 ## Environment variables
 
 The parameters of the connection to the phpIPAM service can be configured using environment variables:
@@ -230,7 +240,7 @@ for sn in subnets:
         if re.match("test.*", a.getDescription()):
             # Modify some fields of the IP
             a.updateMac('00:00:00:00:00:00')
-            a.updateField('description', 'test-update')
+            a.setDescription('test-update')
             a.updateLastSeen()
             # Update address at the phpIPAM service
             ipam.updateAddress(a)
@@ -255,8 +265,8 @@ for sn in subnets:
     free_ips = ipam.getFreeIP(sn, 11, fitAlg='BestFit')
     # Register returned addresses as used
     for ip in free_ips:
-        ip.updateField('description', 'test-free')
-        ip.updateField('hostname', 'test-new-host')
+        ip.setDescription('test-free')
+        ip.setHostname('test-new-host')
         # Register the IP address as used
         ipam.registerIP(ip)
 
