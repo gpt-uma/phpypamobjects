@@ -16,7 +16,7 @@ class ipamVLAN:
             raise ValueError("Dictionary can't be None")
 
     def getId(self) -> int:
-        return self._vlan.get('id', 0)
+        return self._vlan.get('vlanId', 0)
     
     def getName(self) -> str:
         return self._vlan.get('name', '')
