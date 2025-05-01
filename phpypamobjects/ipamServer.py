@@ -4,7 +4,6 @@
 # Initialize logger
 import logging
 
-from phpypamobjects.phpypamobjects import ipamVLAN
 mylogger = logging.getLogger()
 
 import sys, os, getpass, ssl
@@ -25,7 +24,7 @@ from .ipamVLAN import ipamVLAN
 
 from ipaddress import IPv4Address, IPv6Address, IPv4Network, IPv6Network, ip_address
 
-from typing import Optional, Union, Any
+from typing import Optional, Union, Sequence, Tuple, Any
 
 class ipamServer:
     """Manages a connection to a phpIPAM service and high level operations on addresses."""
@@ -108,13 +107,13 @@ class ipamServer:
 
         return password
         
-    def getAllSections(self) -> list[Any]:
+    def getAllSections(self) -> Sequence[Any]:
         try:
             return self.pi.get_entity(controller='sections') # type: ignore
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
     
-    def getAllSubnets(self) -> list[ipamSubnet]:
+    def getAllSubnets(self) -> Sequence[ipamSubnet]:
         """Get all the subnets defined at the phpIPAM service.
         :return: An array with ipamSubnet objects representing the subnets."""
         try:
@@ -122,7 +121,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
     
-    def getAllAddresses(self) -> list[ipamAddress]:
+    def getAllAddresses(self) -> Sequence[ipamAddress]:
         """Get all the IP addresses defined at the phpIPAM service.
         :return: An array with ipamAddress objects representing the addresses."""
         try:
@@ -130,7 +129,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
             
-    def getAllVLANs(self) -> list[ipamVLAN]:
+    def getAllVLANs(self) -> Sequence[ipamVLAN]:
         """Get all the VLANs defined at the phpIPAM service.
         :return: An array with dictionary objects representing the addresses."""
         try:
@@ -138,7 +137,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
-    def getAllScanAgents(self) -> list[ipamScanAgent]:
+    def getAllScanAgents(self) -> Sequence[ipamScanAgent]:
         """Get all the Scan Agents defined at the phpIPAM service.
         :return: An array with dictionary objects representing the scanners."""
         try:
@@ -148,7 +147,7 @@ class ipamServer:
 
     ################################################
 
-    def findSubnetsbyIPMask(self, base_ip:Union[IPv4Address, IPv6Address], mask:int) -> list[ipamSubnet]:
+    def findSubnetsbyIPMask(self, base_ip:Union[IPv4Address, IPv6Address], mask:int) -> Sequence[ipamSubnet]:
         """Find one or more subnets defined by base_ip/mask at the phpIPAM service.
         :param base_ip: The base IP address of the subnet.
         :param mask: An integer with the prefix length of the subnet mask.
@@ -159,7 +158,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
-    def findVLANbyId(self, id:int) -> list[ipamVLAN]:
+    def findVLANbyId(self, id:int) -> Sequence[ipamVLAN]:
         """Find the VLAN with given ID
         In theory, only one address will be returned in the list.
         :param id: The database ID of the VLAN.
@@ -172,7 +171,7 @@ class ipamServer:
 
     ################################################
 
-    def findIPs(self, ip:Union[IPv4Address, IPv6Address]) -> list[ipamAddress]:
+    def findIPs(self, ip:Union[IPv4Address, IPv6Address]) -> Sequence[ipamAddress]:
         """Find the IP addresses registered inside a subnet at the phpIPAM service matching a given IP address.
         In theory, only one address will be returned in the list.
         :param ip: An object representing an ip address.
@@ -183,7 +182,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
-    def findIPsbyHostName(self, hostname:str) -> list[ipamAddress]:
+    def findIPsbyHostName(self, hostname:str) -> Sequence[ipamAddress]:
         """Find the IP address registered inside a subnet at the phpIPAM service matching the given hostname.
         :param hostname: The hostname of the IP address to return.
         :return: An array with ipamAddress objects representing the addresses matching the hostname. If nothing is found, an empty list is returned."""
@@ -192,7 +191,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
-    def findIPsbyNet(self, subnet:ipamSubnet) -> list[ipamAddress]:
+    def findIPsbyNet(self, subnet:ipamSubnet) -> Sequence[ipamAddress]:
         """Find all the IP addresses registered inside a subnet at the phpIPAM service.
         :param subnet: An object representing the subnet.
         :return: An array with ipamAddress objects representing the addresses registered in this subnet."""
@@ -201,7 +200,7 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
-    def findIPsbyField(self, subnet:ipamSubnet, field:str, pattern:str) -> list[ipamAddress]:
+    def findIPsbyField(self, subnet:ipamSubnet, field:str, pattern:str) -> Sequence[ipamAddress]:
         """Find all the IP addresses registered inside a subnet whose value of 'field' matches the given pattern .
         :param subnet: An object representing the subnet.
         :param field: The name of the field to match.
@@ -215,9 +214,9 @@ class ipamServer:
 
     ################################################
 
-    def _firstFit2(self, range:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> list[Union[IPv4Address, IPv6Address]]:
+    def _firstFit2(self, range:Union[IPv4Network, IPv6Network], used_ips:Sequence[Union[IPv4Address, IPv6Address]], num) -> Sequence[Union[IPv4Address, IPv6Address]]:
         # List of contiguous addresses
-        freePool:list[Union[IPv4Address, IPv6Address]] = []
+        freePool:Sequence[Union[IPv4Address, IPv6Address]] = []
         # Go through the IP range of the subnet
         for addr in range:
             if addr in used_ips:
@@ -231,7 +230,7 @@ class ipamServer:
                     return freePool
         return []
 
-    def _pools(self, netRange:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]]) -> list[tuple[Union[IPv4Address, IPv6Address], int]]:
+    def _pools(self, netRange:Union[IPv4Network, IPv6Network], used_ips:Sequence[Union[IPv4Address, IPv6Address]]) -> Sequence[Tuple[Union[IPv4Address, IPv6Address], int]]:
         # List of contiguous addresses
         pools = []
         startIP = None
@@ -256,7 +255,7 @@ class ipamServer:
             pools.append((startIP,count))
         return pools
 
-    def _bestFit(self, netRange:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
+    def _bestFit(self, netRange:Union[IPv4Network, IPv6Network], used_ips:Sequence[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
         # Get all pools
         pools = self._pools(netRange, used_ips=used_ips)
         # Get suitable pools
@@ -270,7 +269,7 @@ class ipamServer:
         bestpool = [(ip,l) for ip,l in pools if l==best].pop()
         return bestpool[0] # type: ignore
 
-    def _worstFit(self, netRange:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
+    def _worstFit(self, netRange:Union[IPv4Network, IPv6Network], used_ips:Sequence[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
         # Get all pools
         pools = self._pools(netRange, used_ips=used_ips)
         # Get suitable pools
@@ -284,7 +283,7 @@ class ipamServer:
         worstpool = [(ip,l) for ip,l in pools if l==worst].pop()
         return worstpool[0] # type: ignore
 
-    def _firstFit(self, range:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
+    def _firstFit(self, range:Union[IPv4Network, IPv6Network], used_ips:Sequence[Union[IPv4Address, IPv6Address]], num) -> Union[IPv4Network, IPv6Network, None]:
         # List of contiguous addresses
         startIP = None
         endIP = None
@@ -307,7 +306,7 @@ class ipamServer:
                     return startIP # type: ignore
         return None
 
-    def findFree(self, subnet:ipamSubnet, num:int, fitAlg:str = 'FirstFit') -> list[ipamAddress]:
+    def findFree(self, subnet:ipamSubnet, num:int, fitAlg:str = 'FirstFit') -> Sequence[ipamAddress]:
         """Finds a block of exactly 'num' contiguous free IP addresses inside given subnet using the indicated optimization algorithm.
         This function does not reserve or lock the addresses. If there are concurrent clients, you must arbitrate clients so that
         no other client is given the same addresses before registration. Registration will fail if another client has registered
@@ -437,7 +436,7 @@ class ipamServer:
                 self.annotate_address(ipAddress=routerIP, sn=sn, description="DEFAULT ROUTER", tag=ipamTags.TAG_router, apiblock=0, apinotremovable=1, isrouter=1, hostname=routerHostname, force=force)
 
     # Get DNS address for subnet
-    def dns_subnet(self, sn:ipamSubnet) -> list[Union[IPv4Address, IPv6Address]]:
+    def dns_subnet(self, sn:ipamSubnet) -> Sequence[Union[IPv4Address, IPv6Address]]:
         if sn.getisPool():
             dnsId=sn.getNameServerId()
             if dnsId != 0:
@@ -457,7 +456,7 @@ class ipamServer:
             try:
                 vList = self.findVLANbyId(id = sn.getvlanId())
                 if len(vList) == 1:
-                    vlan = vList[0]
+                    vlan = vSequence[0]
                     vlanid = vlan.getNumber()
                 else:
                     vlanid = 0
