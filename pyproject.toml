@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phpypamobjects"
-version = "0.1.11"
+version = "0.2.0"
 description = "A high level API client library for phpIPAM.  This library wraps the phpypam library with higher level objects representing phpIPAM abstractions like addresses, subnets and scan agents"
 readme = "README.md"
 authors = [
@@ -25,14 +25,12 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.9.2"
+requires-python = ">=3.7"
 dependencies = [
-    "numpy>=1.19.5",
+    "numpy>=1.16.2",
+    "python-nmap>=0.6.1",
     "phpypam>=1.0.2",
-    "python-nmap>=0.7.1",
 ]
-license = "GPL-3.0-or-later"
-license-files = ["LICENSE"]
 
 [project.urls]
 Homepage = "https://github.com/gpt-uma/phpypamobjects"
