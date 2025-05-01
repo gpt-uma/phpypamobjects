@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 class ipamScanAgent:
-    """This object wraps a JSON dictionary representing a phpIPAM Scan Agent either returned by phpypam or created to insert a new IP address."""
+    """This object wraps a JSON dictionary representing a phpIPAM Scan Agent either returned by phpypam or created to insert a new agent."""
     def __init__(self, agent:dict) -> None:
         """Creates a new object. The object is initialized with a dictionary returned by phpypam.
         :param agent: A JSON dictionary returned by phpypam.
@@ -13,7 +13,7 @@ class ipamScanAgent:
         if agent:
             self._agent:dict = agent
         else:
-            raise ValueError('Both arguments are None.')
+            raise ValueError("Dictionary can't be None")
 
     def getId(self) -> int:
         return self._agent.get('id', 0)
@@ -40,16 +40,16 @@ class ipamScanAgent:
             ts = ts.astimezone()
         return ts
     
-    def getDictionary(self) -> dict:
-        return self._agent
-
     def updateLastAccess(self) -> dict:
         """Updates the last access date of the agent."""
         self._agent['last_access'] = datetime.now().isoformat()
-        return {'last_access': self._agent['last_access']}
+        return {'last_access': self._agent.get('last_access')}
+
+    def getDictionary(self) -> dict:
+        return self._agent
 
     def __str__(self) -> str:
-        return f"ScanAgent {self._agent['name']} ({self._agent['description']}): {self._agent['type']} ({self._agent['code']}) {self._agent['last_access']}"
+        return f"ScanAgent {self._agent.get('name')} ({self._agent.get('description')}): {self._agent.get('type')} ({self._agent.get('code')}) {self._agent.get('last_access')}"
     
 
     

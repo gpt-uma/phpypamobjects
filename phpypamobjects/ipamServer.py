@@ -3,6 +3,8 @@
 
 # Initialize logger
 import logging
+
+from phpypamobjects.phpypamobjects import ipamVLAN
 mylogger = logging.getLogger()
 
 import sys, os, getpass, ssl
@@ -19,6 +21,7 @@ except Exception as e:
 from .ipamSubnet import ipamSubnet
 from .ipamAddress import ipamAddress, ipamTags
 from .ipamScanAgent import ipamScanAgent
+from .ipamVLAN import ipamVLAN
 
 from ipaddress import IPv4Address, IPv6Address, IPv4Network, IPv6Network, ip_address
 
@@ -127,11 +130,11 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
             
-    def getAllVLANs(self) -> list[Any]:
+    def getAllVLANs(self) -> list[ipamVLAN]:
         """Get all the VLANs defined at the phpIPAM service.
         :return: An array with dictionary objects representing the addresses."""
         try:
-            return self.pi.get_entity(controller='vlan') # type: ignore
+            return [ipamVLAN(v) for v in self.pi.get_entity(controller='vlan')] # type: ignore
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
@@ -142,34 +145,6 @@ class ipamServer:
             return [ipamScanAgent(agent) for agent in self.pi.get_entity(controller='tools/scanagents')] # type: ignore
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
-
-    ################################################
-
-    def updateScanAgent(self, agent:ipamScanAgent) -> None:
-        """Update the last access date of a scan agent.
-        :param agent: The scan agent to update."""
-        params = agent.updateLastAccess()
-        self.pi.update_entity(controller='tools/scanagents', controller_path=f'{agent.getId()}', params=params)
-
-    def updateSubnetLastScan(self, subnet:ipamSubnet) -> None:
-        """Update the last scan date of a subnet.
-        :param subnet: The subnet to update."""
-        params = subnet.updateLastScan()
-        self.pi.update_entity(controller='subnets', controller_path=f'{subnet.getId()}', params=params)
-
-    def updateSubnetLastDiscovery(self, subnet:ipamSubnet) -> None:
-        """Update the last scan date of a subnet.
-        :param subnet: The subnet to update."""
-        params = subnet.updateLastDiscovery()
-        self.pi.update_entity(controller='subnets', controller_path=f'{subnet.getId()}', params=params)
-
-    def updateAddress(self, address:ipamAddress) -> None:
-        """Update the last scan date of a subnet.
-        :param address: The address to update."""
-        params = {}
-        for key in address._updated:
-            params[key] = address.getField(key)
-        self.pi.update_entity(controller='addresses', controller_path=f'{address.getId()}', params=params)
 
     ################################################
 
@@ -184,13 +159,24 @@ class ipamServer:
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
 
+    def findVLANbyId(self, id:int) -> list[ipamVLAN]:
+        """Find the VLAN with given ID
+        In theory, only one address will be returned in the list.
+        :param id: The database ID of the VLAN.
+        :return: An array with ipamVLAN objects containing the desired VLAN ir an empty list."""
+        try:
+            return [ipamVLAN(v) for v in self.pi.get_entity(controller='vlan', controller_path=f"/{id}")] # type: ignore
+        except phpypam.PHPyPAMEntityNotFoundException as e:
+            return []
+
+
     ################################################
 
     def findIPs(self, ip:Union[IPv4Address, IPv6Address]) -> list[ipamAddress]:
         """Find the IP addresses registered inside a subnet at the phpIPAM service matching a given IP address.
         In theory, only one address will be returned in the list.
         :param ip: An object representing an ip address.
-        :return: An array with ipamAddress objects representing the addresses registered in this subnet matching the given IP address."""
+        :return: An array with ipamAddress objects representing the addresses registered in this subnet matching the given IP address or an empty list."""
         addr = str(ip)
         try:
             return [ipamAddress(addr=a) for a in self.pi.get_entity(controller='addresses', controller_path=f'/search/{addr}')] # type: ignore
@@ -211,10 +197,9 @@ class ipamServer:
         :param subnet: An object representing the subnet.
         :return: An array with ipamAddress objects representing the addresses registered in this subnet."""
         try:
-            return [ipamAddress(addr=a) for a in self.pi.get_entity(controller='subnets', controller_path=f'{subnet.id}/addresses')] # type: ignore
+            return [ipamAddress(addr=a) for a in self.pi.get_entity(controller='subnets', controller_path=f'{subnet.getId()}/addresses')] # type: ignore
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
-    
 
     def findIPsbyField(self, subnet:ipamSubnet, field:str, pattern:str) -> list[ipamAddress]:
         """Find all the IP addresses registered inside a subnet whose value of 'field' matches the given pattern .
@@ -227,6 +212,8 @@ class ipamServer:
             return [a for a in addresses if re.match(pattern, a.getField(field,''))] # type: ignore
         except phpypam.PHPyPAMEntityNotFoundException as e:
             return []
+
+    ################################################
 
     def _firstFit2(self, range:Union[IPv4Network, IPv6Network], used_ips:list[Union[IPv4Address, IPv6Address]], num) -> list[Union[IPv4Address, IPv6Address]]:
         # List of contiguous addresses
@@ -369,6 +356,36 @@ class ipamServer:
                 raise PermissionError("API can't remove addresses marked as special ones")
 
         self.pi.delete_entity(controller='addresses', controller_path=f'{addr.getId()}')
+
+    ################################################
+
+    def updateScanAgent(self, agent:ipamScanAgent) -> None:
+        """Update the last access date of a scan agent.
+        :param agent: The scan agent to update."""
+        params = agent.updateLastAccess()
+        self.pi.update_entity(controller='tools/scanagents', controller_path=f'{agent.getId()}', params=params)
+
+    def updateSubnetLastScan(self, subnet:ipamSubnet) -> None:
+        """Update the last scan date of a subnet.
+        :param subnet: The subnet to update."""
+        params = subnet.updateLastScan()
+        self.pi.update_entity(controller='subnets', controller_path=f'{subnet.getId()}', params=params)
+
+    def updateSubnetLastDiscovery(self, subnet:ipamSubnet) -> None:
+        """Update the last scan date of a subnet.
+        :param subnet: The subnet to update."""
+        params = subnet.updateLastDiscovery()
+        self.pi.update_entity(controller='subnets', controller_path=f'{subnet.getId()}', params=params)
+
+    def updateAddress(self, address:ipamAddress) -> None:
+        """Update the last scan date of a subnet.
+        :param address: The address to update."""
+        params = {}
+        for key in address._updated:
+            params[key] = address.getField(key)
+        self.pi.update_entity(controller='addresses', controller_path=f'{address.getId()}', params=params)
+
+    ################################################
     
     def annotate_address(self, ipAddress:Union[IPv4Address, IPv6Address], sn:ipamSubnet, description:str, tag:int=2, apiblock:int = 0, apinotremovable:int = 0, isrouter:int = 0, hostname:str='', cleanLastseen:bool=False, force:bool = False):
         # Get address
@@ -383,13 +400,13 @@ class ipamServer:
 
         # Set fields        
         try:
-            ipobj.updateField('description',description, force=force)
-            ipobj.updateField('state',tag, force=force)
-            ipobj.updateField('custom_apiblock',apiblock, force=force)
-            ipobj.updateField('custom_apinotremovable',apinotremovable, force=force)
-            ipobj.updateField('is_gateway',isrouter, force=force)
+            ipobj.setDescription(description, force=force)
+            ipobj.setState(tag, force=force)
+            ipobj.setAPIBlock(apiblock, force=force)
+            ipobj.setAPINotRemovable(apinotremovable, force=force)
+            ipobj.setisGateway(isrouter, force=force)
             if hostname:
-                ipobj.updateField('hostname',hostname, force=force)
+                ipobj.setHostname(hostname, force=force)
             if cleanLastseen:
                 ipobj.cleareLastSeen(force=True)
 
@@ -407,7 +424,7 @@ class ipamServer:
 
     # Annotate basic subnet addresses
     def annotate_subnet(self, sn:ipamSubnet, hasRouter:bool, routerPos:int=-2, routerHostname:str='', force:bool=False):
-        if sn.isPool:
+        if sn.getisPool():
             # Annotate addresses
             subnet = sn.getSubnet()
             baseaddresIP = subnet[0]
@@ -421,36 +438,36 @@ class ipamServer:
 
     # Get DNS address for subnet
     def dns_subnet(self, sn:ipamSubnet) -> list[Union[IPv4Address, IPv6Address]]:
-        if sn.isPool:
-            dnsId=sn._net.get('nameserverId',0)
+        if sn.getisPool():
+            dnsId=sn.getNameServerId()
             if dnsId != 0:
                 # Get nameserver
                 jsonres = self.pi.get_entity(controller='tools/nameservers', controller_path=f"/{dnsId}")
                 if jsonres:
-                    dnsDesc=jsonres.get('name',f'DNSServer subnet {sn.description}')
+                    dnsDesc=jsonres.get('name',f'DNSServer subnet {sn.getDescription()}')
                     dnsIPs=jsonres.get('namesrv1','')
                     if dnsIPs:
                         dnsAddrs=[ip_address(ip) for ip in dnsIPs.split(';')]
                         return dnsAddrs
         return []
 
-
     def listSubnetPlain(self, sn:ipamSubnet) -> str:
         # Get VLAN data
-        if sn.vlanId and sn.vlanId > 0:
+        if sn.getvlanId() and sn.getvlanId() > 0:
             try:
-                jsonres = self.pi.get_entity(controller='vlan', controller_path=f"/{sn.vlanId}")
-                if jsonres:
-                    vlanid = jsonres.get('number')
+                vList = self.findVLANbyId(id = sn.getvlanId())
+                if len(vList) == 1:
+                    vlan = vList[0]
+                    vlanid = vlan.getNumber()
                 else:
-                    vlanid = ''
+                    vlanid = 0
             except Exception as e:
-                vlanid = ''
+                vlanid = 0
         else:
-            vlanid = ''
+            vlanid = 0
             
         # Get other data from subnet
-        description = sn.description
+        description = sn.getDescription()
         routerIP = str(sn.getSubnet()[-2])
         ipRange = f"{sn.getBaseaddr()}/{sn.getMask()}"
         routerMask = sn.getMask()

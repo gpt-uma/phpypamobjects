@@ -30,49 +30,9 @@ class ipamAddress:
         elif ip:
             self._addr:dict = {'ip': str(ip)}
             if subnet:
-                self._addr['subnetId']=subnet.id
+                self._addr['subnetId']=subnet.getId()
         else:
             raise ValueError('Both arguments are None.')
-
-    def getId(self) -> Optional[int]:
-        return self._addr.get('id')
-    
-    def getIP(self) -> Union[IPv4Address, IPv6Address]:
-        return ip_address(self._addr.get('ip')) # type: ignore
-    
-    def setIP(self, ip:IPv4Address):
-        self._addr['ip'] = str(ip)
-    
-    def getSubnetId(self) -> Optional[int]:
-        return self._addr.get('subnetId')
-    
-    def setSubnetId(self, subnetid):
-        self._addr['subnetId'] = subnetid
-    
-    def getDictionary(self) -> dict:
-        return self._addr
-
-    def getHostname(self) -> str:
-        value = self.getField('hostname')
-        return value if value else ''
-
-    def getDescription(self) -> str:
-        value = self.getField('description')
-        return value if value else ''
-
-    def getNote(self) -> str:
-        value = self.getField('note')
-        return value if value else ''
-
-    def getLastSeen(self) -> Optional[datetime]:
-        value = self.getField('lastSeen','')
-        if value:
-            ts = datetime.fromisoformat(value)
-            if not ts.tzname():
-                ts = ts.astimezone()
-            return ts
-        else:
-            return None
 
     def getField(self, field:str, default:Any = None) -> Optional[Any]:
         """Get any field of the JSON object.
@@ -105,6 +65,96 @@ class ipamAddress:
             self._addr[field] = value
             self._updated.add(field)
 
+    def getId(self) -> Optional[int]:
+        return self._addr.get('id')
+    
+    def getIP(self) -> Union[IPv4Address, IPv6Address]:
+        return ip_address(self._addr.get('ip')) # type: ignore
+    
+    def setIP(self, ip:IPv4Address):
+        self._addr['ip'] = str(ip)
+    
+    def getSubnetId(self) -> Optional[int]:
+        return self._addr.get('subnetId')
+    
+    def setSubnetId(self, subnetid):
+        self._addr['subnetId'] = subnetid
+    
+    def getDictionary(self) -> dict[str,Any]:
+        return self._addr
+
+    def getHostname(self) -> str:
+        return self.getField('hostname', '') # type: ignore
+
+    def setHostname(self, value, force=False):
+        self.updateField('description', value, force=force)
+    
+    def getDescription(self) -> str:
+        value = self.getField('description')
+        return value if value else ''
+
+    def setDescription(self, value, force=False):
+        self.updateField('description', value, force=force)
+
+    def getNote(self) -> str:
+        value = self.getField('note')
+        return value if value else ''
+
+    def setNote(self, value):
+        self._addr['note'] = value
+    
+    def setState(self, value, force=False):
+        self.updateField('state', value, force=force)
+    
+    def setAgentId(self, value):
+        self._addr['custom_scanagentid'] = value
+    
+    def getMac(self) -> str:
+        return self.getField('mac','') # type: ignore
+
+    def setMac(self, mac:str, force=False):
+        """Updates the mac."""
+        self.updateField('mac', mac, force=force)
+
+    def getTCPport(self) -> str:
+        return self.getField('custom_tcpports','') # type: ignore
+
+    def setAPIBlock(self, value, force=False):
+        self.updateField('custom_apiblock', value, force=force)
+
+    def setAPINotRemovable(self, value, force=False):
+        self.updateField('custom_apinotremovable', value, force=force)
+
+    def setisGateway(self, value, force=False):
+        self.updateField('is_gateway', value, force=force)
+
+    def setTCPports(self, ports:str, force=False):
+        """Updates the list of TCP ports."""
+        self.updateField('custom_tcpports', ports, force=force)
+
+    def setCurrentOS(self, value:str, force=False):
+        """Updates the list of TCP ports."""
+        self.updateField('custom_OS_current', value, force=force)
+
+    def setDetectedOS(self, value:str, force=False):
+        """Updates the list of TCP ports."""
+        self.updateField('custom_OS_detected', value, force=force)
+
+    def updateScanFirstDate(self, force=False):
+        """Updates the first date in which it answered a ping."""
+        if self.getFieldInt('excludePing') == 0:
+            self.updateField('custom_scanfirstdate', datetime.now().isoformat(), force=force)
+
+    def getLastSeen(self) -> Optional[datetime]:
+        value = self.getField('lastSeen','')
+        if value:
+            ts = datetime.fromisoformat(value)
+            if not ts.tzname():
+                ts = ts.astimezone()
+            return ts
+        else:
+            return None
+
     def updateLastSeen(self, force=False):
         """Updates the last date in which it answered a ping."""
         if self.getFieldInt('excludePing') == 0:
@@ -114,10 +164,6 @@ class ipamAddress:
         """Updates the last date in which it answered a ping."""
         if self.getFieldInt('excludePing') == 0:
             self.updateField('lastSeen', '', force=force)
-
-    def updateMac(self, mac:str, force=False):
-        """Updates the mac."""
-        self.updateField('mac', mac, force=force)
 
     def __str__(self) -> str:
         return str(self.getIP())
