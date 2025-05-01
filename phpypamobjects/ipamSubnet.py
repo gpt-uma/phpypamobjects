@@ -6,14 +6,14 @@ This file provides management for wrapping a dictionary describing a phpIPAM sub
 from datetime import datetime, timedelta
 from email.policy import default
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network, ip_network, ip_address
-from typing import Optional, Union, Any
+from typing import Optional, Union, Dict, Any
 
 class ipamSubnet:
     """This object wraps a JSON dictionary representing a phpIPAM IP subnet returned by phpypam."""
     def __init__(self, net:dict) -> None:
         """Creates a new object. The object is initialized with a dictionary returned by phpypam.
         :param addr: A JSON dictionary returned by phpypam."""
-        self._net:dict[str,Any] = net
+        self._net:Dict[str,Any] = net
 
     def getField(self, field:str, default:Any = None) -> Optional[Any]:
         """Get any field of the JSON object.

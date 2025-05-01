@@ -5,7 +5,7 @@ from .ipamSubnet import ipamSubnet
 
 from ipaddress import IPv4Address, IPv6Address, ip_address
 from datetime import datetime
-from typing import Optional, Union, Any
+from typing import Optional, Union, Dict, Any
 
 class ipamTags:
     TAG_offline = 1
@@ -80,7 +80,7 @@ class ipamAddress:
     def setSubnetId(self, subnetid):
         self._addr['subnetId'] = subnetid
     
-    def getDictionary(self) -> dict[str,Any]:
+    def getDictionary(self) -> Dict[str,Any]:
         return self._addr
 
     def getHostname(self) -> str:
