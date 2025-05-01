@@ -17,17 +17,23 @@ The library includes features such as:
 - Implements some form of protection against the scanning agent updating or deleting some special addresses (base address, broadcast address, router address) in subnets.
 
 ## Requirements
-- Python 3.9 or higher (it uses python typing)
-- phpypam library
-- python-nmap library
-- nmap tool installed in the system
+- `Python 3.7` or higher
+- `phpypam` python package
+- `python-nmap` python package
+- `nmap` tool installed
 
 ## Installation
 
-This library is distributed as a Python package and can be installed using pip. By now it is not available in PyPi, but you can download and install it or specify the URL of the package in git repository.
+`phpypamobjects` is distributed as a standard Python project. It is installed with `pip` in the same way as a standard Python package.  `pip` will install all the python dependencies, but not the `nmap` tool.
 
 ```bash
-pip install phpypamobjects-<version>.tar.gz
+pip install phpypamobjects
+```
+
+**Notice**: Currently this package is not part of python packages auto-downloaded by pip.  If pip does not install automatically the `phpypamobjects` package, you should install it manually specifying the URL of the package in the `dist` folder of the repository.
+
+```bash
+pip install https://github.com/gpt-uma/phpypamobjects/tree/main/dist/phpypamobjects-<version>.tar.gz
 ```
 
 Remember to make the changes to the SQL schema needed by this library and by the scan agent. Changes include some additional `custom fields` for the ipaddresses table, and some additional ipTags used to mark addresses.
