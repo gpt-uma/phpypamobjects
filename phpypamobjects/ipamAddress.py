@@ -87,7 +87,7 @@ class ipamAddress:
         return self.getField('hostname', '') # type: ignore
 
     def setHostname(self, value, force=False):
-        self.updateField('description', value, force=force)
+        self.updateField('hostname', value, force=force)
     
     def getDescription(self) -> str:
         value = self.getField('description')
