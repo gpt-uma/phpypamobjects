@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from email.policy import default
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network, ip_network, ip_address
 from typing import Optional, Union, Dict, Any
+from macaddress import MAC
 
 class ipamSubnet:
     """This object wraps a JSON dictionary representing a phpIPAM IP subnet returned by phpypam."""
@@ -96,6 +97,15 @@ class ipamSubnet:
     def getDescription(self) -> str:
         return self.getField('description','') # type: ignore
 
+    def getBaseMAC(self) -> Optional[MAC]:
+        mac = self.getField('custom_basemac','')
+        if mac:
+            try:
+                return MAC(mac)
+            except ValueError:
+                raise Exception(f"Invalid MAC address {mac} in subnet {self}")
+        return None
+    
     def updateLastDiscovery(self) -> dict:
         """Updates the last discovery date of the agent."""
         self._net['lastDiscovery'] = datetime.now().isoformat()
