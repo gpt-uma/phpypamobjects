@@ -109,10 +109,10 @@ class ipamAddress:
     def setAgentId(self, value):
         self._addr['custom_scanagentid'] = value
     
-    def getMac(self) -> str:
+    def getMAC(self) -> str:
         return self.getField('mac','') # type: ignore
 
-    def setMac(self, mac:str, force=False):
+    def setMAC(self, mac:str, force=False):
         """Updates the mac."""
         self.updateField('mac', mac, force=force)
 
