@@ -1,1 +1,1 @@
-pip install --index-url https://github.com/gpt-uma/phpypamobjects/-/raw/main/dist phpypamobjects
+pip install --index-url https://raw.githubusercontent.com/gpt-uma/phpypamobjects/refs/heads/main/dist/ phpypamobjects
