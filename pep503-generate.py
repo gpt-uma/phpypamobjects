@@ -33,7 +33,7 @@ def generate_simple_index(dist_dir="dist", output_file="index.html"):
             # Convert the repository URL to a raw URL for GitHub if the domain is github.com
             if "//github.com/" in repository_url:
                 # Replace the github.com URL to a raw.githubusercontent.com URL
-                download_url = repository_url.replace("//github.com/", "//raw.githubusercontent.com/").rstrip('.git') + '/refs/heads/main/dist/'
+                download_url = repository_url.replace("//github.com/", "//raw.githubusercontent.com/").rstrip('.git') + '/refs/heads/main/dist'
             # For gitlab the conversion to raw URL is different
             else:
                 download_url = repository_url.rstrip('.git') + '/-/raw/main/dist'
@@ -70,7 +70,7 @@ def generate_simple_index(dist_dir="dist", output_file="index.html"):
 
     # Write the Download command for pip in a separate file
     with open(os.path.join(os.path.dirname(__file__), f'pipinstall_{project_name}.sh'), 'w') as f:
-        f.write(f"pip install --index-url {download_url} {project_name}\n")
+        f.write(f"pip install --index-url {download_url}/index.html\n")
 
 if __name__ == "__main__":
     generate_simple_index()
