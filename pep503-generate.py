@@ -78,6 +78,10 @@ def generate_simple_index(dist_dir="dist", output_file="index.html"):
     # Write PEP 503 compliant HTML file to dist directory   
     with open(os.path.join(os.path.dirname(__file__), dist_dir, output_file), 'w') as f:
         f.write(html_content)
+    # Copy the index.html to the project subdirectory as well
+    with open(os.path.join(os.path.dirname(__file__), dst_package_dir, output_file), 'w') as f:
+        f.write(html_content)
+
 
     # Write the Download command for pip in a separate file
     with open(os.path.join(os.path.dirname(__file__), f'pipinstall_{project_name}.sh'), 'w') as f:
