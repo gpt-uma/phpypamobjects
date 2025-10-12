@@ -42,12 +42,12 @@ def generate_simple_index(dist_dir="dist", output_file="index.html"):
     # This is the destination directory for package files inside a subdirectory named after the project
     dst_package_dir = os.path.join(os.path.dirname(__file__), dist_dir, project_name)
     # Make the destination directory if it does not exist
-    os.makedirs(dst_package_dir, exist_ok=True)
+    #os.makedirs(dst_package_dir, exist_ok=True)
 
-    # Iterate on package files in the dist directory and move them to the project subdirectory
-    for filename in os.listdir(src_package_dir):
-        if filename.endswith(('.whl', '.tar.gz')):
-            os.rename(os.path.join(src_package_dir, filename), os.path.join(dst_package_dir, filename))
+#    # Iterate on package files in the dist directory and move them to the project subdirectory
+#    for filename in os.listdir(src_package_dir):
+#        if filename.endswith(('.whl', '.tar.gz')):
+#            os.rename(os.path.join(src_package_dir, filename), os.path.join(dst_package_dir, filename))
             
     # Regenerate HTML
     html_content = dedent(f'''
@@ -62,10 +62,12 @@ def generate_simple_index(dist_dir="dist", output_file="index.html"):
                     ''')
 
     # Iterate on package files in the dist directory and generate URL links in the PEP 503 index
-    for filename in os.listdir(dst_package_dir):
+    #for filename in os.listdir(dst_package_dir):
+    for filename in os.listdir(src_package_dir):
         if filename.endswith(('.whl', '.tar.gz')):
             # Package files will be located in a subdirectory named after the project
-            file_url = f"{download_url}/{project_name}/{filename}"
+            #file_url = f"{download_url}/{project_name}/{filename}"
+            file_url = f"{download_url}/{filename}"
             # Generate the HTML link for this file
             html_content += f'<a href="{file_url}" data-requires-python="{python_version}">{filename}</a><br />\n'
 
@@ -79,13 +81,13 @@ def generate_simple_index(dist_dir="dist", output_file="index.html"):
     with open(os.path.join(os.path.dirname(__file__), dist_dir, output_file), 'w') as f:
         f.write(html_content)
     # Copy the index.html to the project subdirectory as well
-    with open(os.path.join(os.path.dirname(__file__), dst_package_dir, output_file), 'w') as f:
-        f.write(html_content)
+    #with open(os.path.join(os.path.dirname(__file__), dst_package_dir, output_file), 'w') as f:
+    #    f.write(html_content)
 
 
     # Write the Download command for pip in a separate file
-    with open(os.path.join(os.path.dirname(__file__), f'pipinstall_{project_name}.sh'), 'w') as f:
-        f.write(f"pip install --index-url {download_url} {project_name}\n")
+    with open(os.path.join(os.path.dirname(__file__), f'pipinstall_target_{project_name}.dat'), 'w') as f:
+        f.write(f"pip install 'git+'{download_url}\n")
 
 
 if __name__ == "__main__":
