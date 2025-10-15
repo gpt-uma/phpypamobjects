@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "phpypamobjects"
-version = "0.3.4"
+version = "0.3.5"
 description = "A high level API client library for phpIPAM.  This library wraps the phpypam library with higher level objects representing phpIPAM abstractions like addresses, subnets and scan agents"
 readme = "README.md"
 authors = [
