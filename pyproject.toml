@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools<81", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "phpypamobjects"
-version = "0.3.12"
+version = "0.3.14"
 description = "A high level API client library for phpIPAM.  This library wraps the phpypam library with higher level objects representing phpIPAM abstractions like addresses, subnets and scan agents"
 readme = "README.md"
 authors = [
@@ -29,6 +29,7 @@ classifiers = [
 ]
 requires-python = ">=3.7"
 dependencies = [
+    
     "numpy>=1.16.2",
     "python-nmap>=0.6.1",
     "phpypam>=1.0.2",
