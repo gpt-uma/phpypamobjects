@@ -47,8 +47,10 @@ class ipamServer:
         # Replace environment with arguments if present
         if url:
             self.url = url
-        if url:
+        if app_id:
             self.app_id = app_id
+        if token:
+            self.token = token
         if user:
             self.user = user
         if cacert:
