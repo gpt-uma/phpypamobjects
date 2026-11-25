@@ -29,9 +29,7 @@ classifiers = [
 ]
 requires-python = ">=3.7"
 dependencies = [
-    
     "numpy>=1.16.2",
-    "python-nmap>=0.6.1",
     "phpypam>=1.0.2",
     "macaddress>=2.0.0",
 ]
