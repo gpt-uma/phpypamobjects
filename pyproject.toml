@@ -30,7 +30,7 @@ classifiers = [
 requires-python = ">=3.7"
 dependencies = [
     "numpy>=1.16.2",
-    "phpypam>=1.0.2",
+    "phpypam>=1.0.3",
     "macaddress>=2.0.0",
 ]
 
