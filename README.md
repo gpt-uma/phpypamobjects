@@ -195,10 +195,11 @@ The parameters of the connection to the phpIPAM service can be configured using 
 
 The list of environment variables used is:
 * `MYIPAM_URL`: URL of the phpIPAM service (e.g. `https://myphpipam.example.com`)
-* `MYIPAM_APP_ID`: Application ID of the phpIPAM service (e.g. `myipamclient`)
+* `MYIPAM_APPID`: Application ID of the phpIPAM service (e.g. `myipamclient`)
 * `MYIPAM_TOKEN`: Token of the phpIPAM service (e.g. `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
 * `MYIPAM_USER`: User of the phpIPAM service (e.g. `myipamuser`)
-* `MYIPAM_PASSWORD`: Password of the phpIPAM service (e.g. `pppppppppppppppppp`)
+* `MYIPAM_PASSWD`: Password of the phpIPAM service (e.g. `pppppppppppppppppp`). If it is not defined and no password is given to the constructor, the password is asked interactively.
+* `MYIPAM_CACERT`: Path to the CA certificate file in PEM format (e.g. `/path/to/cacert.pem`), or `NONE` to disable certificate validation.
 
 ## Code examples
 
