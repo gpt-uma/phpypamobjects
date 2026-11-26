@@ -1,6 +1,6 @@
 # Release notes
 
-## 0.3.20
+## 0.3.21
 
 ### Fixed
 - **README documented wrong environment variable names.** The *Environment variables* section of `README.md` listed `MYIPAM_APP_ID` and `MYIPAM_PASSWORD`, but `ipamServer` reads `MYIPAM_APPID` and `MYIPAM_PASSWD`, which are also the names used by the clients and test scripts. The README now uses the names of the code and documents `MYIPAM_CACERT`.
